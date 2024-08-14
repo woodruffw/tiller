@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>TILs</h1>
+
+        <h2>By topic</h2>
+        <div class="by-topic">
+            <p>
+                Sort: <a href="">alphabetically</a> <a href="">by count</a>
+            </p>
+            <ul class="topic-list">
+                {{#each tag_counts}}
+                <li class="topic-list-tag">
+                    <a class="til-tag" href="category/{{@key}}">
+                        <span>{{@key}}</span>
+                        <span class="til-tag-count">{{this}}</span>
+                    </a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <h2>Recent</h2>
+        <div class="recent">
+            {{#each recent}}
+            <div class="til">
+                <header class="til-header">
+                    <h3><a class="til-title" href="til/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
+                    <span class="til-date">{{meta.date}}</span>
+                    {{#each meta.tags}}
+                    <a class="til-tag" href="category/{{this}}">
+                        <span>{{this}}</span>
+                    </a>
+                    {{/each}}
+                </header>
+            </div>
+            {{/each}}
+        </div>
+    </body>
+</html>

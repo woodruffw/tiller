@@ -1,0 +1,54 @@
+body {
+    font-family: "Helvetica", sans-serif;
+    text-align: justify;
+    hyphens: auto;
+    margin: auto;
+    padding: 1em;
+    max-width: 60em;
+    background-color: #F6F6F6;
+}
+
+ul.topic-list {
+    list-style: none;
+    list-style-type: none;
+    padding: 0;
+}
+
+li.topic-list-tag {
+    display: inline-block;
+    margin-right: 0.5em;
+}
+
+a {
+    color: blue;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #F6F6F6;
+    background-color: #0000FF;
+}
+
+a.til-tag {
+    background-color: lightgray;
+    font-size: small;
+    border: 1px ridge blue;
+    border-radius: 15px;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+a:hover.til-tag {
+    background-color: darkblue;
+}
+
+header.til-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.til-date {
+    font-style: italic;
+}
