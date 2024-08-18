@@ -101,11 +101,14 @@ impl TILs {
     pub(crate) fn by_tag(&self) -> HashMap<&str, Vec<&TIL>> {
         let mut tils_by_tag = HashMap::new();
         for tag in self.tags() {
-            let tils = self
+            let mut tils = self
                 .0
                 .iter()
                 .filter(|til| til.meta.tags.contains(tag))
                 .collect::<Vec<_>>();
+
+            tils.sort_by(|a, b| a.meta.date.partial_cmp(&b.meta.date).unwrap());
+            tils.reverse();
 
             tils_by_tag.insert(tag, tils);
         }

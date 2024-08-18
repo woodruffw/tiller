@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use comrak::{markdown_to_html, Options};
 use handlebars::{handlebars_helper, Handlebars};
 use rust_embed::Embed;
@@ -115,7 +115,8 @@ impl Renderer {
         std::fs::write(self.outdir.join("index.html"), index_html)?;
 
         // Category pages.
-        std::fs::create_dir_all(self.outdir.join("category"))?;
+        let category_dir = self.outdir.join("category");
+        std::fs::create_dir_all(&category_dir).with_context(|| "failed to create category dir")?;
         for (tag, tils) in self.tils.by_tag() {
             let category = Category {
                 base_url: &self.base_url,
@@ -133,14 +134,14 @@ impl Renderer {
         }
 
         // Individual TILs.
-        std::fs::create_dir_all(self.outdir.join("til"))?;
+        let post_dir = self.outdir.join("post");
+        std::fs::create_dir_all(&post_dir).with_context(|| "failed to create post dir")?;
         for til in self.tils.0.iter() {
             let til_html = self
                 .hbs
                 .render("til.hbs", &TILPost::new(&self.base_url, til))?;
             std::fs::write(
-                self.outdir
-                    .join("til")
+                post_dir
                     .join(slug::slugify(&til.meta.title))
                     .with_extension("html"),
                 &til_html,
