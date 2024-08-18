@@ -1,6 +1,14 @@
 [package]
 name = "tiller"
+description = "Tiller tills TILs into a static site"
 version = "0.1.0"
+authors = ["William Woodruff <william@yossarian.net>"]
+readme = "README.md"
+homepage = "https://github.com/woodruffw/tiller"
+repository = "https://github.com/woodruffw/tiller"
+keywords = ["til", "today-i-learned", "static-site-generator"]
+categories = ["web-programming", "template-engine"]
+license = "MIT"
 edition = "2021"
 
 [dependencies]
