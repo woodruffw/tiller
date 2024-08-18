@@ -1,19 +1,20 @@
 <!DOCTYPE html>
     <head>
-        <link rel="stylesheet" href="../style.css">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{base_url}}style.css">
     </head>
     <body>
-        <a href="..">Index</a>
+        <a href="{{base_url}}">Index</a>
 
         <h1>TILs for {{tag}}</h1>
 
         {{#each tils}}
         <div class="til">
             <header class="til-header">
-                <h3><a class="til-title" href="til/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
+                <h3><a class="til-title" href="{{@root.base_url}}til/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
                 <span class="til-date">{{meta.date}}</span>
                 {{#each meta.tags}}
-                <a class="til-tag" href="category/{{this}}">
+                <a class="til-tag" href="{{@root.base_url}}category/{{this}}">
                     <span>{{this}}</span>
                 </a>
                 {{/each}}

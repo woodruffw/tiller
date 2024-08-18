@@ -7,7 +7,7 @@ use rust_embed::Embed;
 use serde::Serialize;
 use syntect::highlighting::ThemeSet;
 
-use crate::tiller::{TILs, TIL};
+use crate::tiller::{Meta, TILs, TIL};
 
 #[derive(Embed)]
 #[folder = "assets/templates"]
@@ -20,6 +20,7 @@ struct Static;
 
 #[derive(Serialize)]
 struct Index<'a> {
+    base_url: &'a str,
     index_fragment: Option<&'a str>,
     tag_counts: HashMap<&'a str, usize>,
     recent: Vec<&'a TIL>,
@@ -27,19 +28,43 @@ struct Index<'a> {
 
 #[derive(Serialize)]
 struct Category<'a> {
+    base_url: &'a str,
     tag: &'a str,
     tils: Vec<&'a TIL>,
 }
 
+#[derive(Serialize)]
+struct TILPost<'a> {
+    base_url: &'a str,
+    meta: &'a Meta,
+    content: &'a str,
+}
+
+impl<'a> TILPost<'a> {
+    fn new(base_url: &'a str, til: &'a TIL) -> Self {
+        Self {
+            base_url,
+            meta: &til.meta,
+            content: &til.content,
+        }
+    }
+}
+
 pub(crate) struct Renderer {
     outdir: PathBuf,
+    base_url: String,
     index: Option<String>,
     tils: TILs,
     hbs: Handlebars<'static>,
 }
 
 impl Renderer {
-    pub(crate) fn new(outdir: PathBuf, index: Option<String>, tils: TILs) -> Result<Self> {
+    pub(crate) fn new(
+        outdir: PathBuf,
+        base_url: String,
+        index: Option<String>,
+        tils: TILs,
+    ) -> Result<Self> {
         let mut hbs = Handlebars::new();
         hbs.set_strict_mode(true);
         hbs.register_embed_templates::<Templates>()?;
@@ -52,6 +77,7 @@ impl Renderer {
 
         Ok(Self {
             outdir,
+            base_url,
             index,
             tils,
             hbs,
@@ -80,6 +106,7 @@ impl Renderer {
 
         // Index page.
         let index = Index {
+            base_url: &self.base_url,
             index_fragment: self.index.as_deref(),
             tag_counts: self.tils.tag_counts(),
             recent: self.tils.by_age().take(20).collect(),
@@ -90,17 +117,32 @@ impl Renderer {
         // Category pages.
         std::fs::create_dir_all(self.outdir.join("category"))?;
         for (tag, tils) in self.tils.by_tag() {
-            let category = Category { tag, tils };
+            let category = Category {
+                base_url: &self.base_url,
+                tag,
+                tils,
+            };
             let category_html = self.hbs.render("category.hbs", &category)?;
-            std::fs::write(self.outdir.join("category").join(tag), category_html)?;
+            std::fs::write(
+                self.outdir
+                    .join("category")
+                    .join(tag)
+                    .with_extension("html"),
+                category_html,
+            )?;
         }
 
         // Individual TILs.
         std::fs::create_dir_all(self.outdir.join("til"))?;
         for til in self.tils.0.iter() {
-            let til_html = self.hbs.render("til.hbs", &til)?;
+            let til_html = self
+                .hbs
+                .render("til.hbs", &TILPost::new(&self.base_url, til))?;
             std::fs::write(
-                self.outdir.join("til").join(slug::slugify(&til.meta.title)),
+                self.outdir
+                    .join("til")
+                    .join(slug::slugify(&til.meta.title))
+                    .with_extension("html"),
                 &til_html,
             )?;
         }

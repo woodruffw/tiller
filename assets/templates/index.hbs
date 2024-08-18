@@ -1,7 +1,8 @@
 <!DOCTYPE html>
     <head>
-        <script type="text/javascript" src="index.js"></script>
-        <link rel="stylesheet" href="style.css">
+        <meta charset="UTF-8">
+        <script type="text/javascript" src="{{base_url}}index.js"></script>
+        <link rel="stylesheet" href="{{base_url}}style.css">
     </head>
     <body>
         <h1>TILs</h1>
@@ -21,7 +22,7 @@
             <ul class="topic-list">
                 {{#each tag_counts}}
                 <li class="topic-list-tag">
-                    <a class="til-tag" href="category/{{@key}}">
+                    <a class="til-tag" href="{{@root.base_url}}category/{{@key}}">
                         <span>{{@key}}</span>
                         <span class="til-tag-count">{{this}}</span>
                     </a>
@@ -35,10 +36,10 @@
             {{#each recent}}
             <div class="recent-til">
                 <header class="til-header">
-                    <h3><a class="til-title" href="til/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
+                    <h3><a class="til-title" href="{{@root.base_url}}til/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
                     <span class="til-date">{{meta.date}}</span>
                     {{#each meta.tags}}
-                    <a class="til-tag" href="category/{{this}}">
+                    <a class="til-tag" href="{{@root.base_url}}category/{{this}}">
                         <span>{{this}}</span>
                     </a>
                     {{/each}}

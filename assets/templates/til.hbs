@@ -1,10 +1,11 @@
 <!DOCTYPE html>
     <head>
-        <link rel="stylesheet" href="../syntect.css">
-        <link rel="stylesheet" href="../style.css">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{base_url}}syntect.css">
+        <link rel="stylesheet" href="{{base_url}}style.css">
     </head>
     <body>
-        <a href="..">Index</a>
+        <a href="{{base_url}}">Index</a>
 
         <header class="til-header">
             <h1 class="til-title">{{meta.title}}</h1>
@@ -15,7 +16,7 @@
             <ul class="topic-list">
                 {{#each meta.tags}}
                 <li class="topic-list-tag">
-                    <a class="til-tag" href="../category/{{this}}">
+                    <a class="til-tag" href="{{@root.base_url}}category/{{this}}">
                         <span>{{this}}</span>
                     </a>
                 </li>

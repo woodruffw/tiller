@@ -30,7 +30,12 @@ struct Args {
 }
 
 fn main() -> Result<()> {
-    let args = Args::parse();
+    let mut args = Args::parse();
+
+    // All URL joining assumes a terminating `/`.
+    if !args.base_url.ends_with("/") {
+        args.base_url.push('/');
+    }
 
     let cwd = std::env::current_dir()?;
     let tildir = match args.indir {
@@ -64,6 +69,6 @@ fn main() -> Result<()> {
     let tiller = tiller::Tiller::new();
     let tils = tiller.till(&tildir)?;
 
-    let renderer = render::Renderer::new(outdir, index, tils)?;
+    let renderer = render::Renderer::new(outdir, args.base_url, index, tils)?;
     renderer.render()
 }
