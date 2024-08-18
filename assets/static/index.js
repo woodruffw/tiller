@@ -4,10 +4,8 @@ const sortListAlpha = list => [...list].sort((a, b) => {
 });
 
 const sortListTopicCount = list => [...list].sort((a, b) => {
-    console.log(a);
     const A = parseInt(a.querySelector(".til-tag-count").textContent, 10);
     const B = parseInt(b.querySelector(".til-tag-count").textContent, 10);
-    console.log(`A, B = ${A}, ${B}`);
     return B - A;
 });
 
