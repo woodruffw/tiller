@@ -116,7 +116,7 @@ impl Renderer {
 
         // Category pages.
         let category_dir = self.outdir.join("category");
-        std::fs::create_dir_all(&category_dir).with_context(|| "failed to create category dir")?;
+        std::fs::create_dir_all(category_dir).with_context(|| "failed to create category dir")?;
         for (tag, tils) in self.tils.by_tag() {
             let category = Category {
                 base_url: &self.base_url,

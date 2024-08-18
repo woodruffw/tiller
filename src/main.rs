@@ -33,7 +33,7 @@ fn main() -> Result<()> {
     let mut args = Args::parse();
 
     // All URL joining assumes a terminating `/`.
-    if !args.base_url.ends_with("/") {
+    if !args.base_url.ends_with('/') {
         args.base_url.push('/');
     }
 
