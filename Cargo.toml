@@ -1,7 +1,7 @@
 [package]
 name = "tiller"
 description = "Tiller tills TILs into a static site"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["William Woodruff <william@yossarian.net>"]
 readme = "README.md"
 homepage = "https://github.com/woodruffw/tiller"
