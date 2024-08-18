@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+    <head>
+        <link rel="stylesheet" href="../syntect.css">
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <a href="..">Index</a>
+
+        <header class="til-header">
+            <h1 class="til-title">{{meta.title}}</h1>
+        </header>
+
+        <div class="til-subheader">
+            <span class="til-date">{{meta.date}}</span>
+            <ul class="topic-list">
+                {{#each meta.tags}}
+                <li class="topic-list-tag">
+                    <a class="til-tag" href="../category/{{this}}">
+                        <span>{{this}}</span>
+                    </a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <hr>
+
+        <div class="til-content">
+            {{{content}}}
+        </div>
+
+        <hr>
+    </body>
+</html>

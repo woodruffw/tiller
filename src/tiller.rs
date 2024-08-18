@@ -25,9 +25,7 @@ impl Tiller {
         Self {
             matter: Matter::<YAML>::new(),
             md_options: Options::default(),
-            md_adapter: SyntectAdapterBuilder::new()
-                .theme("Solarized (light)")
-                .build(),
+            md_adapter: SyntectAdapterBuilder::new().css().build(),
         }
     }
 
@@ -71,6 +69,7 @@ pub(crate) struct Meta {
     pub(crate) title: String,
     pub(crate) tags: HashSet<String>,
     pub(crate) date: String,
+    pub(crate) origin: Option<String>,
 }
 
 #[allow(clippy::upper_case_acronyms)]

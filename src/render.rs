@@ -1,9 +1,11 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use anyhow::Result;
+use comrak::{markdown_to_html, Options};
 use handlebars::{handlebars_helper, Handlebars};
 use rust_embed::Embed;
 use serde::Serialize;
+use syntect::highlighting::ThemeSet;
 
 use crate::tiller::{TILs, TIL};
 
@@ -18,6 +20,7 @@ struct Static;
 
 #[derive(Serialize)]
 struct Index<'a> {
+    index_fragment: Option<&'a str>,
     tag_counts: HashMap<&'a str, usize>,
     recent: Vec<&'a TIL>,
 }
@@ -30,12 +33,13 @@ struct Category<'a> {
 
 pub(crate) struct Renderer {
     outdir: PathBuf,
+    index: Option<String>,
     tils: TILs,
     hbs: Handlebars<'static>,
 }
 
 impl Renderer {
-    pub(crate) fn new(outdir: PathBuf, tils: TILs) -> Result<Self> {
+    pub(crate) fn new(outdir: PathBuf, index: Option<String>, tils: TILs) -> Result<Self> {
         let mut hbs = Handlebars::new();
         hbs.set_strict_mode(true);
         hbs.register_embed_templates::<Templates>()?;
@@ -44,16 +48,39 @@ impl Renderer {
         handlebars_helper!(slugify: |x: String| slug::slugify(x));
         hbs.register_helper("slugify", Box::new(slugify));
 
-        Ok(Self { outdir, tils, hbs })
+        let index = index.map(|i| markdown_to_html(&i, &Options::default()));
+
+        Ok(Self {
+            outdir,
+            index,
+            tils,
+            hbs,
+        })
     }
 
     pub(crate) fn render(&self) -> Result<()> {
         // Static assets (CSS, JS).
-        let style = Static::get("style.css").unwrap();
-        std::fs::write(self.outdir.join("style.css"), style.data)?;
+        std::fs::write(
+            self.outdir.join("style.css"),
+            Static::get("style.css").unwrap().data,
+        )?;
+        std::fs::write(
+            self.outdir.join("index.js"),
+            Static::get("index.js").unwrap().data,
+        )?;
+
+        std::fs::write(
+            self.outdir.join("syntect.css"),
+            syntect::html::css_for_theme_with_class_style(
+                // TODO: Make this configurable.
+                &ThemeSet::load_defaults().themes["Solarized (dark)"],
+                syntect::html::ClassStyle::Spaced,
+            )?,
+        )?;
 
         // Index page.
         let index = Index {
+            index_fragment: self.index.as_deref(),
             tag_counts: self.tils.tag_counts(),
             recent: self.tils.by_age().take(20).collect(),
         };

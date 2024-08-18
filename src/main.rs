@@ -10,10 +10,18 @@ mod tiller;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// The directory to run from.
-    /// Defaults to $CWD/til.
+    /// The directory to render from. Must contain a `tils` subdirectory.
     #[arg(short, long)]
     indir: Option<PathBuf>,
+
+    /// An optional index Markdown fragment to include.
+    /// Defaults to {indir}/_index.md, if present.
+    #[arg(long)]
+    index: Option<PathBuf>,
+
+    /// The base site URL to render links from.
+    #[arg(long, default_value = "/")]
+    base_url: String,
 
     /// The directory to render into.
     /// Defaults to $CWD/site.
@@ -26,8 +34,18 @@ fn main() -> Result<()> {
 
     let cwd = std::env::current_dir()?;
     let tildir = match args.indir {
-        Some(indir) => indir,
-        None => [cwd.clone(), "til".into()].iter().collect(),
+        Some(ref indir) => indir.join("tils"),
+        None => cwd.join("tils"),
+    };
+
+    let index = match args.index {
+        Some(index) => Some(std::fs::read_to_string(index)?),
+        None => match args.indir {
+            Some(indir) if indir.join("_index.md").is_file() => {
+                Some(std::fs::read_to_string(indir.join("_index.md"))?)
+            }
+            _ => None,
+        },
     };
 
     let outdir = match args.outdir {
@@ -46,6 +64,6 @@ fn main() -> Result<()> {
     let tiller = tiller::Tiller::new();
     let tils = tiller.till(&tildir)?;
 
-    let renderer = render::Renderer::new(outdir, tils)?;
+    let renderer = render::Renderer::new(outdir, index, tils)?;
     renderer.render()
 }

@@ -4,8 +4,23 @@ body {
     hyphens: auto;
     margin: auto;
     padding: 1em;
-    max-width: 60em;
+    max-width: 50em;
     background-color: #F6F6F6;
+}
+
+h1.til-title {
+    margin-bottom: 0px;
+}
+
+pre {
+    border: 1px solid black;
+    padding: 15px;
+    font-size: 14px;
+}
+
+hr {
+    margin: auto;
+    border: 1px dashed gray;
 }
 
 ul.topic-list {
@@ -43,7 +58,8 @@ a:hover.til-tag {
     background-color: darkblue;
 }
 
-header.til-header {
+header.til-header,
+div.til-subheader {
     display: flex;
     align-items: center;
     gap: 0.5em;
@@ -51,4 +67,15 @@ header.til-header {
 
 .til-date {
     font-style: italic;
+}
+
+button.sort {
+    background-color: lightgreen;
+}
+
+blockquote {
+    background: #f9f9f9;
+    border-left: 10px solid #ccc;
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
 }

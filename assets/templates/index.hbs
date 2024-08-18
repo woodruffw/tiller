@@ -1,14 +1,22 @@
-<html>
+<!DOCTYPE html>
     <head>
+        <script type="text/javascript" src="index.js"></script>
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
         <h1>TILs</h1>
 
-        <h2>By topic</h2>
+        {{#if index_fragment}}
+        <div class="index-content">
+            {{{index_fragment}}}
+        </div>
+        {{/if}}
+
+        <h2>TILs by topic</h2>
         <div class="by-topic">
             <p>
-                Sort: <a href="">alphabetically</a> <a href="">by count</a>
+                Sort <button class="sort" onclick="sortAlpha()">alphabetically</button>,
+                or <button class="sort" onclick="sortCount()">by count</button>.
             </p>
             <ul class="topic-list">
                 {{#each tag_counts}}
@@ -22,10 +30,10 @@
             </ul>
         </div>
 
-        <h2>Recent</h2>
+        <h2>Recent TILs</h2>
         <div class="recent">
             {{#each recent}}
-            <div class="til">
+            <div class="recent-til">
                 <header class="til-header">
                     <h3><a class="til-title" href="til/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
                     <span class="til-date">{{meta.date}}</span>
