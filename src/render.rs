@@ -3,6 +3,7 @@ use std::{collections::HashMap, path::PathBuf};
 use anyhow::{Context, Result};
 use comrak::{markdown_to_html, Options};
 use handlebars::{handlebars_helper, Handlebars};
+use rss::{CategoryBuilder, ChannelBuilder, ItemBuilder};
 use rust_embed::Embed;
 use serde::Serialize;
 use syntect::highlighting::ThemeSet;
@@ -147,6 +148,36 @@ impl Renderer {
                 &til_html,
             )?;
         }
+
+        // RSS feed.
+        // TODO: Per-category feeds?
+        let mut items = vec![];
+        for til in self.tils.by_age().take(20) {
+            items.push(
+                ItemBuilder::default()
+                    .categories(
+                        til.meta
+                            .tags
+                            .iter()
+                            .map(|t| CategoryBuilder::default().name(t).build())
+                            .collect::<Vec<_>>(),
+                    )
+                    .title(til.meta.title.clone())
+                    // This is technically wrong, since RSS requires RFC 822
+                    // timestamps. But I can't be bothered to munge into
+                    // such an annoying format.
+                    .pub_date(til.meta.date.clone())
+                    .content(til.content.clone())
+                    .build(),
+            );
+        }
+
+        let channel = ChannelBuilder::default()
+            .title("TILs")
+            .link(&self.base_url)
+            .items(items)
+            .build();
+        std::fs::write(self.outdir.join("feed.rss"), channel.to_string())?;
 
         Ok(())
     }
