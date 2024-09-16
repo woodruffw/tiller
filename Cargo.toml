@@ -12,7 +12,7 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.87"
+anyhow = "1.0.89"
 clap = { version = "4.5.17", features = ["derive"] }
 comrak = "0.28.0"
 gray_matter = "0.2.8"
