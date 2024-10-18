@@ -31,7 +31,8 @@ ul.topic-list {
 
 li.topic-list-tag {
     display: inline-block;
-    margin-right: 0.5em;
+    margin-right: 0.25em;
+    margin-top: 0.25em;
 }
 
 a {
