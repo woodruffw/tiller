@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, BTreeSet},
     path::Path,
 };
 
@@ -67,7 +67,7 @@ impl Tiller {
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub(crate) struct Meta {
     pub(crate) title: String,
-    pub(crate) tags: HashSet<String>,
+    pub(crate) tags: BTreeSet<String>,
     pub(crate) date: String,
     pub(crate) origin: Option<String>,
 }
@@ -98,8 +98,8 @@ impl TILs {
             .map(|s| s.as_str())
     }
 
-    pub(crate) fn by_tag(&self) -> HashMap<&str, Vec<&TIL>> {
-        let mut tils_by_tag = HashMap::new();
+    pub(crate) fn by_tag(&self) -> BTreeMap<&str, Vec<&TIL>> {
+        let mut tils_by_tag = BTreeMap::new();
         for tag in self.tags() {
             let mut tils = self
                 .0
@@ -116,8 +116,8 @@ impl TILs {
         tils_by_tag
     }
 
-    pub(crate) fn tag_counts(&self) -> HashMap<&str, usize> {
-        let mut counts = HashMap::new();
+    pub(crate) fn tag_counts(&self) -> BTreeMap<&str, usize> {
+        let mut counts = BTreeMap::new();
         for (tag, tils) in self.by_tag() {
             counts.insert(tag, tils.len());
         }

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::BTreeMap, path::PathBuf};
 
 use anyhow::{Context, Result};
 use comrak::{markdown_to_html, Options};
@@ -23,7 +23,7 @@ struct Static;
 struct Index<'a> {
     base_url: &'a str,
     index_fragment: Option<&'a str>,
-    tag_counts: HashMap<&'a str, usize>,
+    tag_counts: BTreeMap<&'a str, usize>,
     recent: Vec<&'a TIL>,
 }
 
