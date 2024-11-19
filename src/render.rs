@@ -8,7 +8,10 @@ use rust_embed::Embed;
 use serde::Serialize;
 use syntect::highlighting::ThemeSet;
 
-use crate::tiller::{Meta, TILs, TIL};
+use crate::{
+    config::Config,
+    tiller::{Meta, TILs, TIL},
+};
 
 #[derive(Embed)]
 #[folder = "assets/templates"]
@@ -21,7 +24,7 @@ struct Static;
 
 #[derive(Serialize)]
 struct Index<'a> {
-    base_url: &'a str,
+    config: &'a Config,
     index_fragment: Option<&'a str>,
     tag_counts: BTreeMap<&'a str, usize>,
     recent: Vec<&'a TIL>,
@@ -29,22 +32,22 @@ struct Index<'a> {
 
 #[derive(Serialize)]
 struct Category<'a> {
-    base_url: &'a str,
+    config: &'a Config,
     tag: &'a str,
     tils: Vec<&'a TIL>,
 }
 
 #[derive(Serialize)]
 struct TILPost<'a> {
-    base_url: &'a str,
+    config: &'a Config,
     meta: &'a Meta,
     content: &'a str,
 }
 
 impl<'a> TILPost<'a> {
-    fn new(base_url: &'a str, til: &'a TIL) -> Self {
+    fn new(config: &'a Config, til: &'a TIL) -> Self {
         Self {
-            base_url,
+            config,
             meta: &til.meta,
             content: &til.content,
         }
@@ -53,7 +56,7 @@ impl<'a> TILPost<'a> {
 
 pub(crate) struct Renderer {
     outdir: PathBuf,
-    base_url: String,
+    config: Config,
     index: Option<String>,
     tils: TILs,
     hbs: Handlebars<'static>,
@@ -62,7 +65,7 @@ pub(crate) struct Renderer {
 impl Renderer {
     pub(crate) fn new(
         outdir: PathBuf,
-        base_url: String,
+        config: Config,
         index: Option<String>,
         tils: TILs,
     ) -> Result<Self> {
@@ -78,7 +81,7 @@ impl Renderer {
 
         Ok(Self {
             outdir,
-            base_url,
+            config,
             index,
             tils,
             hbs,
@@ -107,7 +110,7 @@ impl Renderer {
 
         // Index page.
         let index = Index {
-            base_url: &self.base_url,
+            config: &self.config,
             index_fragment: self.index.as_deref(),
             tag_counts: self.tils.tag_counts(),
             recent: self.tils.by_age().take(20).collect(),
@@ -120,7 +123,7 @@ impl Renderer {
         std::fs::create_dir_all(category_dir).with_context(|| "failed to create category dir")?;
         for (tag, tils) in self.tils.by_tag() {
             let category = Category {
-                base_url: &self.base_url,
+                config: &self.config,
                 tag,
                 tils,
             };
@@ -140,7 +143,7 @@ impl Renderer {
         for til in self.tils.0.iter() {
             let til_html = self
                 .hbs
-                .render("til.hbs", &TILPost::new(&self.base_url, til))?;
+                .render("til.hbs", &TILPost::new(&self.config, til))?;
             std::fs::write(
                 post_dir
                     .join(slug::slugify(&til.meta.title))
@@ -174,7 +177,7 @@ impl Renderer {
 
         let channel = ChannelBuilder::default()
             .title("TILs")
-            .link(&self.base_url)
+            .link(&self.config.base_url)
             .items(items)
             .build();
         std::fs::write(self.outdir.join("feed.rss"), channel.to_string())?;
