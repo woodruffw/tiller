@@ -3,10 +3,13 @@
         <meta charset="UTF-8">
         <title>TILs: {{tag}}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{{base_url}}style.css">
+        <link rel="stylesheet" href="{{config.base_url}}style.css">
+        {{#if config.mastodon}}
+        <meta name="fediverse:creator" content="{{ config.mastodon }}">
+        {{/if}}
     </head>
     <body>
-        <a href="{{base_url}}">Index</a>
+        <a href="{{config.base_url}}">Index</a>
 
         <h1>TILs for {{tag}}</h1>
 
@@ -15,10 +18,10 @@
         {{#each tils}}
         <div class="til">
             <header class="til-header">
-                <h3><a class="til-title" href="{{@root.base_url}}post/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
+                <h3><a class="til-title" href="{{@root.config.base_url}}post/{{(slugify meta.title)}}">{{meta.title}}</a></h3>
                 <span class="til-date">{{meta.date}}</span>
                 {{#each meta.tags}}
-                <a class="til-tag" href="{{@root.base_url}}category/{{this}}">
+                <a class="til-tag" href="{{@root.config.base_url}}category/{{this}}">
                     <span>{{this}}</span>
                 </a>
                 {{/each}}

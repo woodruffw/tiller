@@ -3,11 +3,14 @@
         <meta charset="UTF-8">
         <title>TIL: {{meta.title}}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{{base_url}}syntect.css">
-        <link rel="stylesheet" href="{{base_url}}style.css">
+        <link rel="stylesheet" href="{{config.base_url}}syntect.css">
+        <link rel="stylesheet" href="{{config.base_url}}style.css">
+        {{#if config.mastodon}}
+        <meta name="fediverse:creator" content="{{ config.mastodon }}">
+        {{/if}}
     </head>
     <body>
-        <a href="{{base_url}}">Index</a>
+        <a href="{{config.base_url}}">Index</a>
 
         <header class="til-header">
             <h1 class="til-title">{{meta.title}}</h1>
@@ -18,7 +21,7 @@
             <ul class="topic-list">
                 {{#each meta.tags}}
                 <li class="topic-list-tag">
-                    <a class="til-tag" href="{{@root.base_url}}category/{{this}}">
+                    <a class="til-tag" href="{{@root.config.base_url}}category/{{this}}">
                         <span>{{this}}</span>
                     </a>
                 </li>

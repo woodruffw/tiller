@@ -1,8 +1,10 @@
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 
 use anyhow::{anyhow, Context, Result};
 use clap::Parser;
+use config::Config;
 
+mod config;
 mod render;
 mod tiller;
 
@@ -11,17 +13,9 @@ mod tiller;
 #[command(version, about, long_about = None)]
 struct Args {
     /// The directory to render from. Must contain a `tils` subdirectory.
+    /// Defaults to $CWD/tils.
     #[arg(short, long)]
     indir: Option<PathBuf>,
-
-    /// An optional index Markdown fragment to include.
-    /// Defaults to {indir}/_index.md, if present.
-    #[arg(long)]
-    index: Option<PathBuf>,
-
-    /// The base site URL to render links from.
-    #[arg(long, default_value = "/")]
-    base_url: String,
 
     /// The directory to render into.
     /// Defaults to $CWD/site.
@@ -30,28 +24,32 @@ struct Args {
 }
 
 fn main() -> Result<()> {
-    let mut args = Args::parse();
-
-    // All URL joining assumes a terminating `/`.
-    if !args.base_url.ends_with('/') {
-        args.base_url.push('/');
-    }
+    let args = Args::parse();
 
     let cwd = std::env::current_dir()?;
-    let tildir = match args.indir {
-        Some(ref indir) => indir.join("tils"),
-        None => cwd.join("tils"),
+
+    let indir = match args.indir {
+        Some(indir) => indir,
+        None => cwd.clone(),
     };
 
-    let index = match args.index {
-        Some(index) => Some(std::fs::read_to_string(index)?),
-        None => match args.indir {
-            Some(indir) if indir.join("_index.md").is_file() => {
-                Some(std::fs::read_to_string(indir.join("_index.md"))?)
-            }
-            _ => None,
-        },
+    let tildir = indir.join("tils");
+
+    let index = indir.join("_index.md");
+    let index = match index.is_file() {
+        true => Some(fs::read_to_string(index)?),
+        false => None,
     };
+
+    let mut config = toml::from_str::<Config>(
+        &fs::read_to_string(indir.join("tiller.toml"))
+            .with_context(|| "could not load config file")?,
+    )?;
+
+    // All URL joining assumes a terminating `/`.
+    if !config.base_url.ends_with('/') {
+        config.base_url.push('/');
+    }
 
     let outdir = match args.outdir {
         Some(outdir) => outdir,
@@ -69,6 +67,6 @@ fn main() -> Result<()> {
     let tiller = tiller::Tiller::new();
     let tils = tiller.till(&tildir)?;
 
-    let renderer = render::Renderer::new(outdir, args.base_url, index, tils)?;
+    let renderer = render::Renderer::new(outdir, config, index, tils)?;
     renderer.render()
 }
