@@ -77,7 +77,9 @@ impl Renderer {
         handlebars_helper!(slugify: |x: String| slug::slugify(x));
         hbs.register_helper("slugify", Box::new(slugify));
 
-        let index = index.map(|i| markdown_to_html(&i, &Options::default()));
+        let mut options = Options::default();
+        options.extension.footnotes = true;
+        let index = index.map(|i| markdown_to_html(&i, &options));
 
         Ok(Self {
             outdir,

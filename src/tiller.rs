@@ -22,9 +22,12 @@ pub(crate) struct Tiller {
 impl Tiller {
     pub(crate) fn new() -> Self {
         // TODO: Consider making the theme configurable.
+        let mut options = Options::default();
+        options.extension.footnotes = true;
+
         Self {
             matter: Matter::<YAML>::new(),
-            md_options: Options::default(),
+            md_options: options,
             md_adapter: SyntectAdapterBuilder::new().css().build(),
         }
     }
