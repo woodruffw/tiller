@@ -24,6 +24,9 @@ impl Tiller {
         // TODO: Consider making the theme configurable.
         let mut options = Options::default();
         options.extension.footnotes = true;
+        options.extension.strikethrough = true;
+        options.extension.superscript = true;
+        options.extension.underline = true;
 
         Self {
             matter: Matter::<YAML>::new(),

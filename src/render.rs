@@ -79,6 +79,9 @@ impl Renderer {
 
         let mut options = Options::default();
         options.extension.footnotes = true;
+        options.extension.strikethrough = true;
+        options.extension.superscript = true;
+        options.extension.underline = true;
         let index = index.map(|i| markdown_to_html(&i, &options));
 
         Ok(Self {
