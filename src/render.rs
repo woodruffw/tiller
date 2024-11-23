@@ -19,6 +19,11 @@ use crate::{
 struct Templates;
 
 #[derive(Embed)]
+#[folder = "assets/partials"]
+#[include = "*.hbs"]
+struct Partials;
+
+#[derive(Embed)]
 #[folder = "assets/static"]
 struct Static;
 
@@ -72,6 +77,9 @@ impl Renderer {
         let mut hbs = Handlebars::new();
         hbs.set_strict_mode(true);
         hbs.register_embed_templates::<Templates>()?;
+        // Partials intentionally have .hbs removed since it's visual clutter
+        // when referenced within the templates themselves.
+        hbs.register_embed_templates_with_extension::<Partials>(".hbs")?;
 
         // Inject some useful helpers.
         handlebars_helper!(slugify: |x: String| slug::slugify(x));
@@ -124,37 +132,34 @@ impl Renderer {
         std::fs::write(self.outdir.join("index.html"), index_html)?;
 
         // Category pages.
-        let category_dir = self.outdir.join("category");
-        std::fs::create_dir_all(category_dir).with_context(|| "failed to create category dir")?;
+        let categories_dir = self.outdir.join("category");
+        std::fs::create_dir_all(&categories_dir)
+            .with_context(|| "failed to create categories dir")?;
         for (tag, tils) in self.tils.by_tag() {
+            let category_dir = categories_dir.join(tag);
+            std::fs::create_dir_all(&category_dir)
+                .with_context(|| "failed to create individual category dir")?;
             let category = Category {
                 config: &self.config,
                 tag,
                 tils,
             };
             let category_html = self.hbs.render("category.hbs", &category)?;
-            std::fs::write(
-                self.outdir
-                    .join("category")
-                    .join(tag)
-                    .with_extension("html"),
-                category_html,
-            )?;
+            std::fs::write(category_dir.join("index.html"), category_html)?;
         }
 
         // Individual TILs.
-        let post_dir = self.outdir.join("post");
-        std::fs::create_dir_all(&post_dir).with_context(|| "failed to create post dir")?;
+        let posts_dir = self.outdir.join("post");
+        std::fs::create_dir_all(&posts_dir).with_context(|| "failed to create posts dir")?;
         for til in self.tils.0.iter() {
+            let slug = slug::slugify(&til.meta.title);
+            let post_dir = posts_dir.join(&slug);
+            std::fs::create_dir_all(&post_dir)
+                .with_context(|| "failed to create individual post dir")?;
             let til_html = self
                 .hbs
                 .render("til.hbs", &TILPost::new(&self.config, til))?;
-            std::fs::write(
-                post_dir
-                    .join(slug::slugify(&til.meta.title))
-                    .with_extension("html"),
-                &til_html,
-            )?;
+            std::fs::write(post_dir.join("index.html"), &til_html)?;
         }
 
         // RSS feed.

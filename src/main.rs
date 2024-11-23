@@ -21,6 +21,11 @@ struct Args {
     /// Defaults to $CWD/site.
     #[arg(short, long)]
     outdir: Option<PathBuf>,
+
+    /// Generates in 'dev' mode, meaning suitable for use with a local
+    /// development HTTP server.
+    #[arg(long)]
+    dev: bool,
 }
 
 fn main() -> Result<()> {
@@ -46,9 +51,13 @@ fn main() -> Result<()> {
             .with_context(|| "could not load config file")?,
     )?;
 
-    // All URL joining assumes a terminating `/`.
-    if !config.base_url.ends_with('/') {
-        config.base_url.push('/');
+    if args.dev {
+        config.base_url = "/".into();
+    } else {
+        // All URL joining assumes a terminating `/`.
+        if !config.base_url.ends_with('/') {
+            config.base_url.push('/');
+        }
     }
 
     let outdir = match args.outdir {
