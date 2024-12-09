@@ -12,8 +12,8 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.93"
-clap = { version = "4.5.21", features = ["derive"] }
+anyhow = "1.0.94"
+clap = { version = "4.5.23", features = ["derive"] }
 comrak = "0.31.0"
 gray_matter = "0.2.8"
 handlebars = { version = "6.2.0", features = ["rust-embed"] }
