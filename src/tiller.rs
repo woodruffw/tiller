@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 /// A Tiller tills TILs.
 pub(crate) struct Tiller {
     matter: Matter<YAML>,
-    md_options: Options,
+    md_options: Options<'static>,
     md_adapter: SyntectAdapter,
 }
 
