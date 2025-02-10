@@ -13,7 +13,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.95"
-clap = { version = "4.5.27", features = ["derive"] }
+clap = { version = "4.5.28", features = ["derive"] }
 comrak = "0.35.0"
 gray_matter = "0.2.8"
 handlebars = { version = "6.2.0", features = ["rust-embed"] }
@@ -23,4 +23,4 @@ serde = { version = "1.0.217", features = ["derive"] }
 serde_json = "1.0.138"
 slug = "0.1.6"
 syntect = "5.2.0"
-toml = "0.8.19"
+toml = "0.8.20"
