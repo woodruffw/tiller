@@ -27,6 +27,7 @@ impl Tiller {
         options.extension.strikethrough = true;
         options.extension.superscript = true;
         options.extension.underline = true;
+        options.extension.table = true;
 
         Self {
             matter: Matter::<YAML>::new(),

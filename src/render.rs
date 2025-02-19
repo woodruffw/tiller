@@ -90,6 +90,7 @@ impl Renderer {
         options.extension.strikethrough = true;
         options.extension.superscript = true;
         options.extension.underline = true;
+        options.extension.table = true;
         let index = index.map(|i| markdown_to_html(&i, &options));
 
         Ok(Self {
