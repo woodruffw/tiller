@@ -9,6 +9,7 @@ body {
 
 h1.til-title {
     margin-bottom: 0px;
+    text-wrap: balance;
 }
 
 pre {
