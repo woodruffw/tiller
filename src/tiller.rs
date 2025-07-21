@@ -48,8 +48,8 @@ impl Tiller {
 
             let parsed = self
                 .matter
-                .parse_with_struct::<Meta>(&raw_til)
-                .ok_or(anyhow!("couldn't parse front matter"))?;
+                .parse::<Meta>(&raw_til)
+                .map_err(|_| anyhow!("couldn't parse front matter"))?;
 
             let mut plugins = Plugins::default();
 
@@ -59,7 +59,7 @@ impl Tiller {
                 markdown_to_html_with_plugins(&parsed.content, &self.md_options, &plugins);
 
             tils.push(TIL {
-                meta: parsed.data,
+                meta: parsed.data.ok_or(anyhow!("missing front matter data"))?,
                 content,
             })
         }
