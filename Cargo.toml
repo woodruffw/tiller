@@ -12,15 +12,15 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.99"
-clap = { version = "4.5.47", features = ["derive"] }
+anyhow = "1.0.100"
+clap = { version = "4.5.48", features = ["derive"] }
 comrak = "0.41.1"
 gray_matter = "0.3.2"
 handlebars = { version = "6.2.0", features = ["rust-embed"] }
 rss = "2.0.12"
 rust-embed = "8.7.2"
-serde = { version = "1.0.223", features = ["derive"] }
+serde = { version = "1.0.226", features = ["derive"] }
 serde_json = "1.0.145"
 slug = "0.1.6"
 syntect = "5.2.0"
-toml = "0.9.5"
+toml = "0.9.7"
