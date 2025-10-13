@@ -23,4 +23,4 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 slug = "0.1.6"
 syntect = "5.3.0"
-toml = "0.9.7"
+toml = "0.9.8"
