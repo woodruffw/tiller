@@ -5,9 +5,9 @@ use std::{
 
 use anyhow::{anyhow, Result};
 use comrak::{
-    markdown_to_html_with_plugins,
+    markdown_to_html_with_plugins, options,
     plugins::syntect::{SyntectAdapter, SyntectAdapterBuilder},
-    Options, Plugins,
+    Options,
 };
 use gray_matter::{engine::YAML, Matter};
 use serde::{Deserialize, Serialize};
@@ -51,7 +51,7 @@ impl Tiller {
                 .parse::<Meta>(&raw_til)
                 .map_err(|_| anyhow!("couldn't parse front matter"))?;
 
-            let mut plugins = Plugins::default();
+            let mut plugins = options::Plugins::default();
 
             plugins.render.codefence_syntax_highlighter = Some(&self.md_adapter);
 
