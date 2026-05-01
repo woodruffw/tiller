@@ -131,4 +131,22 @@ impl TILs {
 
         counts
     }
+
+    pub(crate) fn by_date(&self) -> BTreeMap<String, Vec<&TIL>> {
+        let mut tils_by_date = BTreeMap::new();
+        for til in &self.0 {
+            let key = til.meta.date.get(..7).unwrap_or(&til.meta.date).to_string();
+            tils_by_date
+                .entry(key)
+                .or_insert_with(Vec::new)
+                .push(til);
+        }
+
+        for tils in tils_by_date.values_mut() {
+            tils.sort_by(|a, b| a.meta.date.partial_cmp(&b.meta.date).unwrap());
+            tils.reverse();
+        }
+
+        tils_by_date
+    }
 }

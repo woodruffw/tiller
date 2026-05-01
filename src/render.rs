@@ -13,6 +13,31 @@ use crate::{
     tiller::{Meta, TILs, TIL},
 };
 
+const MONTH_NAMES: [&str; 12] = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
+
+fn format_month_year(key: &str) -> String {
+    let parts: Vec<&str> = key.split('-').collect();
+    if parts.len() != 2 {
+        return key.to_string();
+    }
+    let month: usize = parts[1].parse().unwrap_or(1);
+    let month_name = MONTH_NAMES.get(month - 1).unwrap_or(&"Unknown");
+    format!("{} {}", month_name, parts[0])
+}
+
 #[derive(Embed)]
 #[folder = "assets/templates"]
 #[include = "*.hbs"]
@@ -28,10 +53,18 @@ struct Partials;
 struct Static;
 
 #[derive(Serialize)]
+struct DateGroup {
+    key: String,
+    display: String,
+    count: usize,
+}
+
+#[derive(Serialize)]
 struct Index<'a> {
     config: &'a Config,
     index_fragment: Option<&'a str>,
     tag_counts: BTreeMap<&'a str, usize>,
+    date_groups: Vec<DateGroup>,
     recent: Vec<&'a TIL>,
 }
 
@@ -39,6 +72,14 @@ struct Index<'a> {
 struct Category<'a> {
     config: &'a Config,
     tag: &'a str,
+    tils: Vec<&'a TIL>,
+}
+
+#[derive(Serialize)]
+struct Archive<'a> {
+    config: &'a Config,
+    month_year: String,
+    key: String,
     tils: Vec<&'a TIL>,
 }
 
@@ -123,10 +164,21 @@ impl Renderer {
         )?;
 
         // Index page.
+        let date_groups: Vec<DateGroup> = self
+            .tils
+            .by_date()
+            .iter()
+            .map(|(key, tils)| DateGroup {
+                display: format_month_year(key),
+                count: tils.len(),
+                key: key.clone(),
+            })
+            .collect();
         let index = Index {
             config: &self.config,
             index_fragment: self.index.as_deref(),
             tag_counts: self.tils.tag_counts(),
+            date_groups,
             recent: self.tils.by_age().take(20).collect(),
         };
         let index_html = self.hbs.render("index.hbs", &index)?;
@@ -147,6 +199,24 @@ impl Renderer {
             };
             let category_html = self.hbs.render("category.hbs", &category)?;
             std::fs::write(category_dir.join("index.html"), category_html)?;
+        }
+
+        // Archive pages (by month/year).
+        let archive_dir = self.outdir.join("archive");
+        std::fs::create_dir_all(&archive_dir)
+            .with_context(|| "failed to create archive dir")?;
+        for (key, tils) in self.tils.by_date() {
+            let month_dir = archive_dir.join(&key);
+            std::fs::create_dir_all(&month_dir)
+                .with_context(|| "failed to create individual archive dir")?;
+            let archive = Archive {
+                config: &self.config,
+                month_year: format_month_year(&key),
+                key: key.clone(),
+                tils,
+            };
+            let archive_html = self.hbs.render("archive.hbs", &archive)?;
+            std::fs::write(month_dir.join("index.html"), archive_html)?;
         }
 
         // Individual TILs.
