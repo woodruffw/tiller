@@ -136,10 +136,7 @@ impl TILs {
         let mut tils_by_date = BTreeMap::new();
         for til in &self.0 {
             let key = til.meta.date.get(..7).unwrap_or(&til.meta.date).to_string();
-            tils_by_date
-                .entry(key)
-                .or_insert_with(Vec::new)
-                .push(til);
+            tils_by_date.entry(key).or_insert_with(Vec::new).push(til);
         }
 
         for tils in tils_by_date.values_mut() {

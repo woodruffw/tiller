@@ -203,8 +203,7 @@ impl Renderer {
 
         // Archive pages (by month/year).
         let archive_dir = self.outdir.join("archive");
-        std::fs::create_dir_all(&archive_dir)
-            .with_context(|| "failed to create archive dir")?;
+        std::fs::create_dir_all(&archive_dir).with_context(|| "failed to create archive dir")?;
         for (key, tils) in self.tils.by_date() {
             let month_dir = archive_dir.join(&key);
             std::fs::create_dir_all(&month_dir)
