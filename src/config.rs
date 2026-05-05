@@ -5,6 +5,8 @@ pub(crate) struct Config {
     pub(crate) base_url: String,
     pub(crate) mastodon: Option<String>,
     #[serde(default)]
+    pub(crate) copy_code: bool,
+    #[serde(default)]
     pub(crate) top_links: Vec<Link>,
 }
 

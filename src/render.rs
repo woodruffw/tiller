@@ -112,10 +112,13 @@ impl Renderer {
             self.outdir.join("index.js"),
             Static::get("index.js").unwrap().data,
         )?;
-        std::fs::write(
-            self.outdir.join("copy-code.js"),
-            Static::get("copy-code.js").unwrap().data,
-        )?;
+
+        if self.config.copy_code {
+            std::fs::write(
+                self.outdir.join("copy-code.js"),
+                Static::get("copy-code.js").unwrap().data,
+            )?;
+        }
 
         std::fs::write(
             self.outdir.join("syntect.css"),
