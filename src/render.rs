@@ -249,7 +249,7 @@ impl Renderer {
                     // This is technically wrong, since RSS requires RFC 822
                     // timestamps. But I can't be bothered to munge into
                     // such an annoying format.
-                    .pub_date(til.meta.date.clone())
+                    .pub_date(til.meta.date.to_string())
                     .content(til.content.clone())
                     .build(),
             );

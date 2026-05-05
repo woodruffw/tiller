@@ -17,6 +17,7 @@ clap = { version = "4.6.1", features = ["derive"] }
 comrak = "0.52.0"
 gray_matter = "0.3.2"
 handlebars = { version = "6.2.0", features = ["rust-embed"] }
+jiff = "0.2.15"
 rss = "2.0.12"
 rust-embed = "8.11.0"
 serde = { version = "1.0.228", features = ["derive"] }

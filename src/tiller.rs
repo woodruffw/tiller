@@ -10,7 +10,8 @@ use comrak::{
     Options,
 };
 use gray_matter::{engine::YAML, Matter};
-use serde::{Deserialize, Serialize};
+use jiff::civil::Date;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 /// A Tiller tills TILs.
 pub(crate) struct Tiller {
@@ -46,10 +47,12 @@ impl Tiller {
 
             let raw_til = std::fs::read_to_string(&til_file)?;
 
-            let parsed = self
-                .matter
-                .parse::<Meta>(&raw_til)
-                .map_err(|_| anyhow!("couldn't parse front matter"))?;
+            let parsed = self.matter.parse::<Meta>(&raw_til).map_err(|err| {
+                anyhow!(
+                    "couldn't parse front matter for {}: {err}",
+                    til_file.display()
+                )
+            })?;
 
             let mut plugins = options::Plugins::default();
 
@@ -65,7 +68,7 @@ impl Tiller {
         }
 
         // TODO: impl Ord for TIL
-        tils.sort_unstable_by(|a, b| a.meta.date.partial_cmp(&b.meta.date).unwrap());
+        tils.sort_unstable_by(|a, b| a.meta.date.cmp(&b.meta.date));
 
         Ok(TILs(tils))
     }
@@ -75,8 +78,44 @@ impl Tiller {
 pub(crate) struct Meta {
     pub(crate) title: String,
     pub(crate) tags: BTreeSet<String>,
-    pub(crate) date: String,
+    #[serde(
+        deserialize_with = "deserialize_til_date",
+        serialize_with = "serialize_til_date"
+    )]
+    pub(crate) date: Date,
     pub(crate) origin: Option<String>,
+}
+
+fn deserialize_til_date<'de, D>(deserializer: D) -> std::result::Result<Date, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let raw = String::deserialize(deserializer)?;
+    parse_til_date(&raw).map_err(serde::de::Error::custom)
+}
+
+fn serialize_til_date<S>(date: &Date, serializer: S) -> std::result::Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    serializer.serialize_str(&date.to_string())
+}
+
+fn parse_til_date(raw: &str) -> std::result::Result<Date, String> {
+    let is_yyyy_mm_dd = raw.len() == 10
+        && raw.as_bytes()[4] == b'-'
+        && raw.as_bytes()[7] == b'-'
+        && raw
+            .bytes()
+            .enumerate()
+            .all(|(i, b)| i == 4 || i == 7 || b.is_ascii_digit());
+
+    if !is_yyyy_mm_dd {
+        return Err(format!("date must be in YYYY-MM-DD format, got {raw:?}"));
+    }
+
+    raw.parse()
+        .map_err(|err| format!("invalid YYYY-MM-DD date {raw:?}: {err}"))
 }
 
 #[allow(clippy::upper_case_acronyms)]
@@ -92,7 +131,7 @@ pub(crate) struct TILs(pub(crate) Vec<TIL>);
 impl TILs {
     pub(crate) fn by_age(&self) -> impl Iterator<Item = &TIL> {
         let mut sorted = self.0.iter().collect::<Vec<_>>();
-        sorted.sort_by(|a, b| a.meta.date.partial_cmp(&b.meta.date).unwrap());
+        sorted.sort_by(|a, b| a.meta.date.cmp(&b.meta.date));
         sorted.reverse();
 
         sorted.into_iter()
@@ -114,7 +153,7 @@ impl TILs {
                 .filter(|til| til.meta.tags.contains(tag))
                 .collect::<Vec<_>>();
 
-            tils.sort_by(|a, b| a.meta.date.partial_cmp(&b.meta.date).unwrap());
+            tils.sort_by(|a, b| a.meta.date.cmp(&b.meta.date));
             tils.reverse();
 
             tils_by_tag.insert(tag, tils);
@@ -135,12 +174,12 @@ impl TILs {
     pub(crate) fn by_date(&self) -> BTreeMap<String, Vec<&TIL>> {
         let mut tils_by_date = BTreeMap::new();
         for til in &self.0 {
-            let key = til.meta.date.get(..7).unwrap_or(&til.meta.date).to_string();
+            let key = format!("{:04}-{:02}", til.meta.date.year(), til.meta.date.month());
             tils_by_date.entry(key).or_insert_with(Vec::new).push(til);
         }
 
         for tils in tils_by_date.values_mut() {
-            tils.sort_by(|a, b| a.meta.date.partial_cmp(&b.meta.date).unwrap());
+            tils.sort_by(|a, b| a.meta.date.cmp(&b.meta.date));
             tils.reverse();
         }
 
