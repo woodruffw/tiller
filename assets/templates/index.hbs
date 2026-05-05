@@ -39,20 +39,6 @@
             </ul>
         </div>
 
-        <h2>TILs by date</h2>
-        <div class="by-date">
-            <ul class="topic-list">
-                {{#each date_groups}}
-                <li class="topic-list-tag">
-                    <a class="til-tag" href="{{@root.config.base_url}}archive/{{key}}">
-                        <span>{{display}}</span>
-                        <span class="til-tag-count">{{count}}</span>
-                    </a>
-                </li>
-                {{/each}}
-            </ul>
-        </div>
-
         <h2>Recent TILs</h2>
         <div class="recent">
             {{#each recent}}
@@ -69,5 +55,20 @@
             </div>
             {{/each}}
         </div>
+
+        <h2>TILs by date</h2>
+        <div class="by-date">
+            <ul class="topic-list">
+                {{#each date_groups}}
+                <li class="topic-list-tag">
+                    <a class="til-tag" href="{{@root.config.base_url}}archive/{{key}}">
+                        <span>{{display}}</span>
+                        <span class="til-tag-count">{{count}}</span>
+                    </a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+        
     </body>
 </html>
