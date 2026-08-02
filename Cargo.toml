@@ -14,7 +14,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.102"
 clap = { version = "4.6.1", features = ["derive"] }
-comrak = "0.53.0"
+comrak = "0.54.0"
 gray_matter = "0.3.2"
 handlebars = { version = "6.2.0", features = ["rust-embed"] }
 rss = "2.0.13"
