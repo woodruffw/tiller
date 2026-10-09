@@ -19,6 +19,39 @@ pre {
     overflow: scroll;
 }
 
+.code-container {
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: transparent;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #333;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.code-container:hover .copy-btn {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    background: #eee;
+}
+
+.copy-btn.copied {
+    opacity: 1;
+    color: green;
+    border-color: green;
+}
+
 hr {
     margin: auto;
     border: 1px dashed gray;
